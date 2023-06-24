@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "Implementation of the RS School's task 'File manager'",
   "scripts": {
-
+    "start": "node index.js"
   }
 }
