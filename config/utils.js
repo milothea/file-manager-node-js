@@ -1,14 +1,17 @@
 import { OS_OPERATIONS_COMMAND, USERNAME_PREFIX } from './constants.js';
 
-const getPath = (source, command) => {
-    const regExp = new RegExp(/^[^\s]$/gmi);
-    const path = source.replace(command, '');
+const checkIfNameCorrect = (fileName) => {
+    const testRegExp = new RegExp(/[\/\\"'*;-?\[\]()~!${}<>#@&|.]/gmi);
 
-    if (regExp.test(path)) {
-        return path;
+    if (testRegExp.test(fileName)) {
+        throw new Error();
     }
 
-    return 'ERROR';
+    return true;
+}
+
+const getCommandArgument = (source, command) => {
+    return source.replace(command, '').trim();
 };
 
 const getUsername = (args = []) => {
@@ -28,14 +31,15 @@ const parseCommand = (sourceCommand) => {
     const command = sourceCommand.split(' ')[0];
 
     if (command === OS_OPERATIONS_COMMAND) {
-        return sourceCommand;
+        return sourceCommand.toLowerCase();
     }
 
     return command;
 };
 
 export {
-    getPath,
+    checkIfNameCorrect,
+    getCommandArgument,
     getUsername,
     parseCommand,
 }
