@@ -12,7 +12,7 @@ const runFileManager = () => {
 
     stdout.write(`Welcome to the File Manager, ${username}!${DEFAULT_SYSTEM_MESSAGE}`);
 
-    stdin.on('data', (userInput, key) => {
+    stdin.on('data', (userInput) => {
         const input = userInput.toString().trim();
         const parsedCommand = utils.parseCommand(input);
         // const path = utils.getPath(input, parsedCommand);
