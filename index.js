@@ -1,13 +1,13 @@
 import { stdin, stdout } from 'node:process';
-// import { changeDirectory } from './src/directoryActions.js';
 import * as utils from './config/utils.js';
 import { COMMANDS, DEFAULT_SYSTEM_MESSAGE } from './config/constants.js';
-import * as defaultActions from './src/defaultAction.js';
+import * as defaultActions from './src/defaultActions.js';
 import * as dirActions from './src/directoryActions.js';
 import * as filesActions from './src/filesActions.js';
 import * as hashActions from './src/hashActions.js';
 import * as systemActions from './src/systemDataActions.js';
 import { wrongCommandHandler } from './src/errorHandling.js';
+import {parseArguments} from "./config/utils.js";
 
 const runFileManager = () => {
     const { argv } = process;
@@ -18,19 +18,26 @@ const runFileManager = () => {
     stdin.on('data', (userInput) => {
         const input = userInput.toString().trim();
         const parsedCommand = utils.parseCommand(input);
-        const argument = utils.getCommandArgument(input, parsedCommand);
+        const inputArgs = utils.getCommandArgument(input, parsedCommand);
 
         switch(parsedCommand) {
             case COMMANDS.ADD:
-                filesActions.createNewFile(argument);
+                filesActions.createNewFile(inputArgs);
+                break;
+            case COMMANDS.COPY:
+                filesActions.copyFileToDest(parseArguments(inputArgs));
                 break;
             case COMMANDS.CAT:
+                filesActions.readFile(inputArgs);
+                break;
             case COMMANDS.COMPRESS:
-            case COMMANDS.COPY:
             case COMMANDS.DECOMPRESS:
             case COMMANDS.DELETE:
+                filesActions.removeFile(inputArgs);
+                break;
             case COMMANDS.MOVE:
-            case COMMANDS.RENAME:
+                filesActions.moveFile(parseArguments(inputArgs));
+                break;
             case COMMANDS.GO_TO_UP:
                 defaultActions.handleUnimplementedCommands(parsedCommand);
                 break;
@@ -47,16 +54,19 @@ const runFileManager = () => {
                 defaultActions.quitProcess(username);
                 break;
             case COMMANDS.HASH:
-                hashActions.printHashForFile(argument);
+                hashActions.printHashForFile(inputArgs);
                 break;
             case COMMANDS.HOMEDIR:
                 systemActions.printHomeDirectory();
                 break;
-            case COMMANDS.CHANGE_DIR:
-                dirActions.changeDirectory(argument);
-                break;
+            // case COMMANDS.CHANGE_DIR:
+            //     dirActions.changeDirectory(inputArgs);
+            //     break;
             case COMMANDS.LIST:
                 dirActions.printCurDirFiles();
+                break;
+            case COMMANDS.RENAME:
+                filesActions.renameFile(parseArguments(inputArgs));
                 break;
             case COMMANDS.USERNAME:
                 systemActions.printSystemUsername();
