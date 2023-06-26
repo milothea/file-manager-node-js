@@ -7,7 +7,7 @@ import * as filesActions from './src/filesActions.js';
 import * as hashActions from './src/hashActions.js';
 import * as systemActions from './src/systemDataActions.js';
 import { wrongCommandHandler } from './src/errorHandling.js';
-import {parseArguments} from "./config/utils.js";
+import { parseArguments } from './config/utils.js';
 
 const runFileManager = () => {
     const { argv } = process;
@@ -30,8 +30,11 @@ const runFileManager = () => {
             case COMMANDS.CAT:
                 filesActions.readFile(inputArgs);
                 break;
+            case COMMANDS.CHANGE_DIR:
             case COMMANDS.COMPRESS:
             case COMMANDS.DECOMPRESS:
+                defaultActions.handleUnimplementedCommands(parsedCommand);
+                break;
             case COMMANDS.DELETE:
                 filesActions.removeFile(inputArgs);
                 break;
@@ -54,14 +57,11 @@ const runFileManager = () => {
                 defaultActions.quitProcess(username);
                 break;
             case COMMANDS.HASH:
-                hashActions.printHashForFile(inputArgs);
+                hashActions.hashFile(inputArgs);
                 break;
             case COMMANDS.HOMEDIR:
                 systemActions.printHomeDirectory();
                 break;
-            // case COMMANDS.CHANGE_DIR:
-            //     dirActions.changeDirectory(inputArgs);
-            //     break;
             case COMMANDS.LIST:
                 dirActions.printCurDirFiles();
                 break;
