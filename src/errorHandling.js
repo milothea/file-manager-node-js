@@ -1,11 +1,11 @@
 import { stdout } from 'node:process';
 import { DEFAULT_SYSTEM_MESSAGE, END_LINE, OPERATIONS_ERROR_MESSAGE } from '../config/constants.js';
 
-const errorHandler = (path = null) => {
+const errorHandler = (message = null) => {
     let errorMessage = `${OPERATIONS_ERROR_MESSAGE}${DEFAULT_SYSTEM_MESSAGE}`;
 
-    if (path || path === '') {
-        errorMessage = `${OPERATIONS_ERROR_MESSAGE} Please, check if entered path is correct - '${path}'. ${DEFAULT_SYSTEM_MESSAGE}`;
+    if (message || message === '') {
+        errorMessage = `${OPERATIONS_ERROR_MESSAGE} Please, check if entered path is correct ${message}. ${DEFAULT_SYSTEM_MESSAGE}`;
     }
 
     stdout.write(errorMessage);

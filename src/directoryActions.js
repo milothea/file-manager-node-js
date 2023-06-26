@@ -21,7 +21,7 @@ const changeWorkingDir = (path) => {
             chdir(path);
             stdout.write(`Working directory has been changed to '${path}'. ${DEFAULT_SYSTEM_MESSAGE}`);
         })
-        .catch(() => errorHandler(path));
+        .catch(() => errorHandler(`'${path}'`));
 }
 
 const printCurDirFiles = async () => {
@@ -33,7 +33,7 @@ const printCurDirFiles = async () => {
             console.table(parseFilesData(files));
             stdout.write(DEFAULT_SYSTEM_MESSAGE);
         })
-        .catch((e) => errorHandler(e));
+        .catch(() => errorHandler());
 };
 
 const setParentDirAsWorking = () => {

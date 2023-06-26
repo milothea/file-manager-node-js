@@ -14,7 +14,7 @@ const createNewFile = async (fileName, showMessage = true) => {
                 if (showMessage)
                     stdout.write(`The file '${fileName}' has been created at current working directory.${DEFAULT_SYSTEM_MESSAGE}`)
             })
-            .catch((e) => errorHandler(e));
+            .catch(() => errorHandler(`. Maybe '${filename}' already exists`));
 
     } else {
         incorrectNameHandler(fileName);
@@ -35,15 +35,15 @@ const copyFileToDest = async ([ pathToFile, dest ], showMessage = true) => {
                 if (showMessage) stdout.write(`File '${pathToFile}' has been copied to '${dest}'.${DEFAULT_SYSTEM_MESSAGE}`)
 
             })
-            .catch(() => errorHandler(`from '${pathToFile}' to '${dest}'`));
+            .catch(() => errorHandler(`. Maybe '${fileName}' already exists at '${dest}'`));
     } catch {
-        errorHandler(`from '${pathToFile}' to '${dest}'`);
+        errorHandler(`. You have tried to copy '${pathToFile}' to '${dest}'`);
     }
 } ;
 
 const removeFile = async (path, showMessage = true) => {
     await rm(path, (err) => {
-        if (err) errorHandler(path);
+        if (err) errorHandler(`'${path}'`);
 
         if (showMessage) stdout.write(`File '${path}' has been removed.${DEFAULT_SYSTEM_MESSAGE}`);
     });
@@ -55,7 +55,7 @@ const moveFile = async ([ pathToFile, dest ]) => {
         await removeFile(pathToFile, false);
         stdout.write(`File ${pathToFile} has been moved to ${dest}.${DEFAULT_SYSTEM_MESSAGE}`);
     } catch {
-        errorHandler(`from '${pathToFile}' to '${dest}'`);
+        errorHandler(`. You have tried to move '${pathToFile}' to '${dest}'`);
     }
 };
 
@@ -68,7 +68,7 @@ const readFile = async (path) => {
         await finished(stream);
         stdout.write(`File has been read.${DEFAULT_SYSTEM_MESSAGE}`);
     } catch {
-        errorHandler(path);
+        errorHandler(`'${path}'`);
     }
 };
 

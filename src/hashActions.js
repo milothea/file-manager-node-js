@@ -12,7 +12,7 @@ const hashFile = async (path) => {
 
             stdout.write(`Hash for file '${path}' is '${result}'.${DEFAULT_SYSTEM_MESSAGE}`);
         })
-        .catch(() => errorHandler(path));
+        .catch(() => errorHandler(`'${path}'`));
 };
 
 export {
