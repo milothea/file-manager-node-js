@@ -1,6 +1,6 @@
-import * as fs from 'node:fs';
 import { readdir } from 'node:fs/promises';
-import { stdout } from 'node:process';
+import { chdir, cwd, stdout } from 'node:process';
+import { parse } from 'node:path';
 import { errorHandler } from './errorHandling.js';
 import { DEFAULT_SYSTEM_MESSAGE, END_LINE } from '../config/constants.js';
 
@@ -9,30 +9,42 @@ const parseFilesData = (files) =>  files.map((file) => ({
     Type: file.isFile() ? 'file' : 'directory',
 }));
 
-const printCurDirFiles = async () => {
-    const curDir = process.cwd();
-    const files = await readdir(curDir, { withFileTypes: true });
-
-    stdout.write(`There are files which current directory '${curDir}' contains:${END_LINE}`);
-    console.table(parseFilesData(files));
-    stdout.write(DEFAULT_SYSTEM_MESSAGE);
+const getNewDirectoryPath = (path) => {
+    return path.split('/')
+        .filter((_, i, arr) => i !== arr.length)
+        .join('/');
 };
 
-const changeDirectory = async (path) => {
-    let dirExisted = true;
+const changeWorkingDir = (path) => {
+    readdir(path)
+        .then(() => {
+            chdir(path);
+            stdout.write(`Working directory has been changed to '${path}'. ${DEFAULT_SYSTEM_MESSAGE}`);
+        })
+        .catch(() => errorHandler(path));
+}
 
-    await readdir(path).catch(() => dirExisted = false);
+const printCurDirFiles = async () => {
+    const curDir = cwd();
 
-    console.log(dirExisted);
+    readdir(curDir, { withFileTypes: true })
+        .then((files) => {
+            stdout.write(`There are files which current directory '${curDir}' contains:${END_LINE}`);
+            console.table(parseFilesData(files));
+            stdout.write(DEFAULT_SYSTEM_MESSAGE);
+        })
+        .catch((e) => errorHandler(e));
+};
 
-    if (dirExisted) {
-        process.chdir(path);
-    } else {
-        errorHandler(path);
-    }
+const setParentDirAsWorking = () => {
+    const path = getNewDirectoryPath(parse(cwd()).dir);
+
+    chdir(path);
+    stdout.write(`Working directory has been changed to '${path}'. ${DEFAULT_SYSTEM_MESSAGE}`);
 };
 
 export {
-    changeDirectory,
+    changeWorkingDir,
     printCurDirFiles,
+    setParentDirAsWorking,
 }

@@ -31,6 +31,8 @@ const runFileManager = () => {
                 filesActions.readFile(inputArgs);
                 break;
             case COMMANDS.CHANGE_DIR:
+                dirActions.changeWorkingDir(inputArgs);
+                break;
             case COMMANDS.COMPRESS:
             case COMMANDS.DECOMPRESS:
                 defaultActions.handleUnimplementedCommands(parsedCommand);
@@ -42,7 +44,7 @@ const runFileManager = () => {
                 filesActions.moveFile(parseArguments(inputArgs));
                 break;
             case COMMANDS.GO_TO_UP:
-                defaultActions.handleUnimplementedCommands(parsedCommand);
+                dirActions.setParentDirAsWorking(inputArgs);
                 break;
             case COMMANDS.CPU:
                 systemActions.printCPUsData();
