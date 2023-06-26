@@ -1,13 +1,10 @@
 import { OS_OPERATIONS_COMMAND, USERNAME_PREFIX } from './constants.js';
+import { wrongCommandHandler } from '../src/errorHandling.js';
 
 const checkIfNameCorrect = (fileName) => {
-    const testRegExp = new RegExp(/[\/\\"'*;-?\[\]()~!${}<>#@&|.]/gmi);
+    const testRegExp = new RegExp(/[\/\\"'*;-?\[\]()~!${}<>#@&|]/gmi);
 
-    if (testRegExp.test(fileName)) {
-        throw new Error();
-    }
-
-    return true;
+    return !(testRegExp.test(fileName));
 }
 
 const getCommandArgument = (source, command) => {
@@ -27,6 +24,19 @@ const getUsername = (args = []) => {
 
     return username || 'Noname';
 };
+
+const parseArguments = (args) => {
+    const argsArr = args.split(' ');
+
+    if (!args || argsArr.length !== 2) {
+        wrongCommandHandler(`rn ${args}`);
+
+        return;
+    }
+
+    return argsArr.map((arg) => arg.trim());
+};
+
 const parseCommand = (sourceCommand) => {
     const command = sourceCommand.split(' ')[0];
 
@@ -41,5 +51,6 @@ export {
     checkIfNameCorrect,
     getCommandArgument,
     getUsername,
+    parseArguments,
     parseCommand,
 }
