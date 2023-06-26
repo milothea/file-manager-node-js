@@ -6,6 +6,7 @@ import * as dirActions from './src/directoryActions.js';
 import * as filesActions from './src/filesActions.js';
 import * as hashActions from './src/hashActions.js';
 import * as systemActions from './src/systemDataActions.js';
+import * as zlibActions from './src/zlibActions.js';
 import { wrongCommandHandler } from './src/errorHandling.js';
 import { parseArguments } from './config/utils.js';
 
@@ -34,8 +35,10 @@ const runFileManager = () => {
                 dirActions.changeWorkingDir(inputArgs);
                 break;
             case COMMANDS.COMPRESS:
+                zlibActions.compressFile(inputArgs);
+                break;
             case COMMANDS.DECOMPRESS:
-                defaultActions.handleUnimplementedCommands(parsedCommand);
+                zlibActions.decompressFile(parseArguments(inputArgs));
                 break;
             case COMMANDS.DELETE:
                 filesActions.removeFile(inputArgs);
