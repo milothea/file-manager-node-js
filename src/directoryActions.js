@@ -4,10 +4,14 @@ import { parse } from 'node:path';
 import { errorHandler } from './errorHandling.js';
 import { DEFAULT_SYSTEM_MESSAGE, END_LINE } from '../config/constants.js';
 
-const parseFilesData = (files) =>  files.map((file) => ({
-    name: file.name,
-    Type: file.isFile() ? 'file' : 'directory',
-}));
+const parseFilesData = (files) => {
+    const mappedFiles = [...files].map((file) => ({
+        name: file.name,
+        Type: file.isFile() ? 'file' : 'directory',
+    }));
+
+    return mappedFiles.sort((a) => a.Type === 'file' ? 1 : -1);
+};
 
 const getNewDirectoryPath = (path) => {
     return path.split('/')

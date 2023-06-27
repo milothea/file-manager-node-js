@@ -9,52 +9,51 @@ import { errorHandler } from './errorHandling.js';
 import { DEFAULT_SYSTEM_MESSAGE } from '../config/constants.js';
 
 const compressFile = async (path) => {
-    const { base: fileName } = parse(path);
-    const compressedFilePath = path.replace(fileName, `compressed_${fileName}.gz`);
+    if (!path || path.length !== 2) return;
+
+    const [ pathToSourceFile, dest ] = path;
+    const { base: fileName } = parse(pathToSourceFile);
+    const compressedFilePath = join(dest, fileName.replace(fileName, `compressed_${fileName}.gz`));
 
     readFile(compressedFilePath)
-        .then(() => errorHandler(`. Compressed file already exists on path '${path}'`))
-        .catch(async (err) => {
-            if (!err) {
-                await createNewFile(compressedFilePath, false);
+        .then(() => errorHandler(`. Compressed file already exists on path '${pathToSourceFile}'`))
+        .catch(async () => {
+            await createNewFile(compressedFilePath, false);
+            const brotli = createBrotliCompress();
+            const readStream = createReadStream(pathToSourceFile);
+            const writeStream = createWriteStream(compressedFilePath);
+            const compression = readStream.pipe(brotli).pipe(writeStream);
 
-                const brotli = createBrotliCompress();
-                const readStream = createReadStream(path);
-                const writeStream = createWriteStream(compressedFilePath);
-                const compression = readStream.pipe(brotli).pipe(writeStream);
+            compression.on('error', () => errorHandler(`'${pathToSourceFile} ${dest}'`));
 
-                compression.on('error', () => errorHandler());
-
-                await finished(compression);
-                stdout.write(`File '${path}' has been compressed and stored to '${compressedFilePath}'.${DEFAULT_SYSTEM_MESSAGE}`);
-            } else {
-                errorHandler(`'${path}'`);
-            }
+            await finished(compression);
+            stdout.write(`File '${pathToSourceFile}' has been compressed and stored to '${compressedFilePath}'.${DEFAULT_SYSTEM_MESSAGE}`);
         });
 };
 
-const decompressFile = async ([ compressedFilePath, dest ]) => {
-    try {
-        const { base: fileName } = parse(compressedFilePath);
-        const decompressedFileName = fileName
-            .replace('compressed_', '')
-            .replace('.gz', '');
-        const destPath = join(dest, decompressedFileName);
+const decompressFile = async (path) => {
+    if (!path || path.length !== 2) return;
 
-        await createNewFile(destPath);
+    const [ pathToSourceFile, dest ] = path;
+    const { base: fileName } = parse(pathToSourceFile);
+    const decompressedFileName = fileName
+        .replace('compressed_', '')
+        .replace('.gz', '');
+    const destPath = join(dest, decompressedFileName);
 
-        const brotli = createBrotliDecompress();
-        const readStream = createReadStream(compressedFilePath);
-        const writeStream = createWriteStream(destPath);
-        const decompression = readStream.pipe(brotli).pipe(writeStream);
+    await createNewFile(destPath, false)
+        .then(async () => {
+            const brotli = createBrotliDecompress();
+            const readStream = createReadStream(pathToSourceFile);
+            const writeStream = createWriteStream(destPath);
+            const decompression = readStream.pipe(brotli).pipe(writeStream);
 
-        decompression.on('error', () => errorHandler());
+            decompression.on('error', () => errorHandler(`decompress '${pathToSourceFile}' to '${dest}'`));
 
-        await finished();
-        stdout.write(`File '${compressedFilePath}' has been decompressed and stored to '${destPath}'.${DEFAULT_SYSTEM_MESSAGE}`);
-    } catch {
-        errorHandler(`decompress '${compressedFilePath}' to '${dest}'`);
-    }
+            await finished(decompression);
+            stdout.write(`File '${pathToSourceFile}' has been decompressed and stored to '${destPath}'.${DEFAULT_SYSTEM_MESSAGE}`);
+
+        });
 };
 
 export {

@@ -11,8 +11,7 @@ import { wrongCommandHandler } from './src/errorHandling.js';
 import { parseArguments } from './config/utils.js';
 
 const runFileManager = () => {
-    const { argv } = process;
-    const username = utils.getUsername(argv);
+    const username = utils.getUsername(process.env, process.argv);
 
     stdout.write(`Welcome to the File Manager, ${username}!${DEFAULT_SYSTEM_MESSAGE}`);
 
@@ -26,7 +25,7 @@ const runFileManager = () => {
                 filesActions.createNewFile(inputArgs);
                 break;
             case COMMANDS.COPY:
-                filesActions.copyFileToDest(parseArguments(inputArgs));
+                filesActions.copyFileToDest(parseArguments(parsedCommand, inputArgs));
                 break;
             case COMMANDS.CAT:
                 filesActions.readFile(inputArgs);
@@ -35,16 +34,16 @@ const runFileManager = () => {
                 dirActions.changeWorkingDir(inputArgs);
                 break;
             case COMMANDS.COMPRESS:
-                zlibActions.compressFile(inputArgs);
+                zlibActions.compressFile(parseArguments(parsedCommand, inputArgs));
                 break;
             case COMMANDS.DECOMPRESS:
-                zlibActions.decompressFile(parseArguments(inputArgs));
+                zlibActions.decompressFile(parseArguments(parsedCommand, inputArgs));
                 break;
             case COMMANDS.DELETE:
                 filesActions.removeFile(inputArgs);
                 break;
             case COMMANDS.MOVE:
-                filesActions.moveFile(parseArguments(inputArgs));
+                filesActions.moveFile(parseArguments(parsedCommand, inputArgs));
                 break;
             case COMMANDS.GO_TO_UP:
                 dirActions.setParentDirAsWorking(inputArgs);
@@ -71,7 +70,7 @@ const runFileManager = () => {
                 dirActions.printCurDirFiles();
                 break;
             case COMMANDS.RENAME:
-                filesActions.renameFile(parseArguments(inputArgs));
+                filesActions.renameFile(parseArguments(parsedCommand, inputArgs));
                 break;
             case COMMANDS.USERNAME:
                 systemActions.printSystemUsername();

@@ -11,7 +11,7 @@ const getCommandArgument = (source, command) => {
     return source.replace(command, '').trim();
 };
 
-const getUsername = (args = []) => {
+const getUsername = (env, args) => {
     let username;
 
     for (let i = 0; i < args.length; i++) {
@@ -21,15 +21,16 @@ const getUsername = (args = []) => {
             break;
         }
     }
+    if (!username) username = env.npm_config_username || 'Noname';
 
-    return username || 'Noname';
+    return username;
 };
 
-const parseArguments = (args) => {
+const parseArguments = (command, args) => {
     const argsArr = args.split(' ');
 
     if (!args || argsArr.length !== 2) {
-        wrongCommandHandler(`rn ${args}`);
+        wrongCommandHandler(`${command} ${args}`);
 
         return;
     }
