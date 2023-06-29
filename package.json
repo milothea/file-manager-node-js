@@ -2,7 +2,8 @@
   "name": "file-manager-node-js",
   "version": "1.0.0",
   "description": "Implementation of the RS School's task 'File manager'",
+  "type": "module",
   "scripts": {
-
+    "start": "node index.js --username=LOL"
   }
 }
